@@ -1,2 +1,1 @@
-import './a.css'
-console.log(222)
+console.log('a.js run')
