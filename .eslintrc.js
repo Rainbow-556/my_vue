@@ -16,6 +16,7 @@ module.exports = {
   rules: {
     'vue/component-tags-order': ['error', { order: [['template', 'script'], 'style'] }],
     'no-var': ['warn'],
-    eqeqeq: ['warn']
+    eqeqeq: ['warn'],
+    'guard-for-in': ['off']
   }
 }
