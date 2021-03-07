@@ -11,9 +11,10 @@ import img from '../asset/images/a.jpg'
 console.log('app.vue', img)
 
 export default {
+  name: 'Test',
   data() {
     return {
-      number: 0,
+      number: 1,
       img
     }
   },
@@ -37,6 +38,7 @@ $color: red;
 }
 .btn {
   color: blue;
+  font-size: 25px;
 }
 .img {
   display: block;
