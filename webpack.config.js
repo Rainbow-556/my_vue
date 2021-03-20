@@ -27,6 +27,9 @@ const config = {
     // 修改在html中引用的打包后的js、css、图片等引用路径，例子：https://www.aaa.com/assets/images/a.744973e7.jpg
     // publicPath: 'https://www.aaa.com/assets/'
   },
+  resolve: {
+    extensions: ['.vue', '.js']
+  },
   module: {
     rules: [
       {
@@ -81,7 +84,7 @@ const config = {
     }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
-      filename: isDev ? 'css/[name].css' : 'css/[name].[contenthash:8].css',
+      filename: isDev ? '[name].css' : '[name].[contenthash:8].css',
       chunkFilename: isDev ? '[id].css' : '[id].[contenthash:8].css'
     }),
     new MyPlugin()
