@@ -33,8 +33,6 @@ html,
 body {
   width: 100%;
   height: 100%;
-  padding: 0;
-  margin: 0;
   box-sizing: border-box;
   // 使用hidden时，iOS就没有滚到底的回弹效果
   // overflow: hidden;

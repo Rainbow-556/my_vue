@@ -10,7 +10,7 @@ export default {}
 
 <style lang="scss" scoped>
 .app-body {
-  position: relative;
+  position: static;
   flex-grow: 1;
   overflow-y: auto;
   // iOS非body元素的内部滚动时，手指离开屏幕时，惯性滚动

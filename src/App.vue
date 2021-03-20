@@ -17,10 +17,10 @@ import AppHeader from './component/AppHeader'
 import AppBody from './component/AppBody'
 import AppFooter from './component/AppFooter'
 import img from '../asset/images/a.jpg'
-console.log('app.vue', img)
+console.log('App.vue', img)
 
 export default {
-  name: 'Test',
+  name: 'MyVue',
   components: {
     Lottie,
     AppFrame,
@@ -30,20 +30,18 @@ export default {
   },
   data() {
     return {
-      number: 1,
       img,
       arr: []
     }
   },
   created() {},
-  methods: {
-    add() {
-      this.number++
-    }
-  }
+  methods: {}
 }
 </script>
 
+<style lang="scss">
+@import '../asset/css/normalize.scss';
+</style>
 <style lang="scss" scoped>
 .img {
   display: block;
