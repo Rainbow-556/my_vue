@@ -2,6 +2,8 @@
   <AppFrame>
     <AppHeader></AppHeader>
     <AppBody>
+      <p class="number">1000</p>
+      <p>1000</p>
       <img class="img" :src="img" alt="" />
       <Lottie />
       <div v-for="(item, index) in arr" :key="index" class="item">{{ item }}</div>
@@ -39,12 +41,15 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@import '../asset/css/normalize.scss';
+<style>
+@import '../asset/css/global.scss';
 </style>
 <style lang="scss" scoped>
 .img {
   display: block;
   width: 100%;
+}
+.number {
+  font-family: 'DINPro-Medium';
 }
 </style>

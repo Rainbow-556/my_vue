@@ -21,7 +21,6 @@ const config = {
      hash和chunkhash的区别：
       hash：这次打包所有结果的hash，所有使用[hash]占位符最后生成的值都是相同的
       chunkhash：每个chunk都会单独计算hash
-
      */
     filename: isDev ? 'js/[name].[hash:8].js' : 'js/[name].[chunkhash:8].js'
     // 修改在html中引用的打包后的js、css、图片等引用路径，例子：https://www.aaa.com/assets/images/a.744973e7.jpg
@@ -33,6 +32,12 @@ const config = {
   module: {
     rules: [
       {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {}
+      },
+      {
         test: /\.vue$/,
         use: ['vue-loader']
       },
@@ -41,12 +46,13 @@ const config = {
       //   use: ['vue-style-loader', 'css-loader']
       // },
       // {
-      //   test: /\.scss$/,
+      //   test: /\.s?css$/,
       //   use: ['vue-style-loader', 'css-loader', 'sass-loader']
       // },
       {
-        test: /\.scss$/,
+        test: /\.s?css$/,
         use: [
+          // 把css抽取成单独的文件
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
@@ -54,17 +60,32 @@ const config = {
               // publicPath: 'https://www.aaa.com/assets/'
             }
           },
+          // 把css内容用js动态生成style标签插入到head标签里
+          // 'style-loader', // or vue-style-loader(使用vue时，就要用该loader)
+          // 把css转换成commonjs对象
           'css-loader',
+          // 解决scss文件中引用font文件时的路径问题，https://webpack.js.org/loaders/sass-loader/#problems-with-url
+          'resolve-url-loader',
+          // 把scss文件转换成css
           'sass-loader'
         ]
       },
       {
-        test: /\.(png|jpe?g)/i,
+        test: /\.(png|jpe?g|gif|svg|webp)$/i,
         loader: 'url-loader',
         options: {
           limit: 50 * 1024,
           // 输出到images目录下
-          name: 'images/[name].[contenthash:8].[ext]'
+          outputPath: 'images',
+          name: '[name].[contenthash:8].[ext]'
+        }
+      },
+      {
+        test: /\.(woff2?|ttf|eot)$/i,
+        loader: 'file-loader',
+        options: {
+          outputPath: 'font',
+          name: '[name].[contenthash:8].[ext]'
         }
       }
     ]
