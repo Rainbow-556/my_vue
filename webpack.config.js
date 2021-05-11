@@ -15,6 +15,7 @@ const config = {
   mode: 'none',
   entry: './src/main.js',
   output: {
+    // webpack打包后的文件输出根目录
     path: path.join(__dirname, 'dist'),
     /*
      开启dev-server时，只能使用[hash]，否则会dev-server会报错
@@ -63,7 +64,13 @@ const config = {
           // 把css内容用js动态生成style标签插入到head标签里
           // 'style-loader', // or vue-style-loader(使用vue时，就要用该loader)
           // 把css转换成commonjs对象
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1 // 让postcss-loader能够处理css
+            }
+          },
+          'postcss-loader',
           // 解决scss文件中引用font文件时的路径问题，https://webpack.js.org/loaders/sass-loader/#problems-with-url
           'resolve-url-loader',
           // 把scss文件转换成css

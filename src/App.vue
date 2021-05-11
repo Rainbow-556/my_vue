@@ -48,6 +48,7 @@ export default {
 .img {
   display: block;
   width: 100%;
+  border-radius: var(--radius);
 }
 .number {
   font-family: 'DINPro-Medium';
