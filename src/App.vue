@@ -47,7 +47,7 @@ export default {
 <style lang="scss" scoped>
 .img {
   display: block;
-  width: 100%;
+  width: 375px;
   border-radius: var(--radius);
 }
 .number {

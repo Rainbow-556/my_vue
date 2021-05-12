@@ -5,6 +5,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <script>
+      // 移动端rem适配
+      function updateRootFontSize() {
+        // postcss-pxtorem插件里设置的是按照设计稿宽度为375px，1rem=10px的规则来做的
+        // 所以37.5rem=设备屏幕宽度，按照该公式即可动态算出1rem的px值
+        var htmlWidth = document.documentElement.clientWidth || document.body.clientWidth
+        var htmlDom = document.getElementsByTagName('html')[0]
+        htmlDom.style.fontSize = htmlWidth / 37.5 + 'px'
+      }
+      updateRootFontSize()
+      window.onresize = function() {
+        updateRootFontSize()
+      }
+    </script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"
       integrity="sha512-BB7rb8ZBAxtdJdB7nwDijJH9NC+648xSzviK9Itm+5APTtdpgKz1+82bDl4znz/FBhd0R7pJ/gQtomnMpZYzRw=="
