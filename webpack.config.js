@@ -67,7 +67,11 @@ const config = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1 // 让postcss-loader能够处理css
+              /*
+                当css-loader处理css内容时，发现里面还有@import引用的资源时，会把该资源交给它上N个loader处理（N为配置的个数）
+                具体解释：https://jsweibo.github.io/2019/07/02/webpack%E4%B8%AD%E7%9A%84css-loader/#importLoaders
+                */
+              importLoaders: 1
             }
           },
           'postcss-loader',
