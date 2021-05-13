@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
+import store from './store'
 // 打印通过DefinePlugin设置的全局属性
 console.log('DefinePlugin', aNumber, aVersion, process.env.NODE_ENV)
 
@@ -13,5 +14,6 @@ setTimeout(() => {
 }, 3000)
 
 new Vue({
+  store,
   render: h => h(App)
 }).$mount('#app')
