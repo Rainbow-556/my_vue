@@ -18,7 +18,7 @@ import AppFrame from './component/AppFrame'
 import AppHeader from './component/AppHeader'
 import AppBody from './component/AppBody'
 import AppFooter from './component/AppFooter'
-import img from '../asset/images/a.jpg'
+import img from './asset/images/a.jpg'
 console.log('App.vue', img)
 
 export default {
@@ -42,7 +42,7 @@ export default {
 </script>
 
 <style>
-@import '../asset/css/global.scss';
+@import './asset/css/global.scss';
 </style>
 <style lang="scss" scoped>
 .img {

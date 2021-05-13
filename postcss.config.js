@@ -23,7 +23,7 @@ module.exports = {
       // 只对stage=3阶段的特性添加pollyfill
       stage: 3,
       // 指定变量的来源
-      importFrom: './asset/css/postcss-preset-env-variables.css',
+      importFrom: './src/asset/css/postcss-preset-env-variables.css',
       // 可以根据特性id单独打开或关闭
       features: {
       }
