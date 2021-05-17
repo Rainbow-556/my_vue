@@ -1,15 +1,19 @@
 <template>
   <div class="vuex-test-box" @click.stop>
     <p>Vuex Test</p>
+    <p>State、Mutation</p>
     <button @click="setName">setName</button>
     <button @click="addAge">addAge</button>
     <p>{{ $store.state.name }}: {{ $store.state.age }}</p>
     <p>{{ nameAlias }}: {{ nextAge }}</p>
     <button @click="addTodo">addTodo</button>
     <p>doneTodosCount: {{ $store.getters.doneTodosCount }}</p>
+    <p>Getters</p>
     <p v-for="item in $store.getters.doneTodos" :key="item.name">{{ item.name + ' is ' + item.state }}</p>
     <input v-model="todoName" type="text" />
     <p>getTodoByName: {{ $store.getters.getTodoByName(todoName) }}</p>
+    <p>Action</p>
+    <button @click="triggerAction">triggerAction</button>
   </div>
 </template>
 
@@ -45,6 +49,14 @@ export default {
     },
     addTodo() {
       this.$store.commit('addTodo', { name: 'vue-router', state: 'undone' })
+    },
+    triggerAction() {
+      // $store.dispatch()始终返回Promise
+      // const res = this.$store.dispatch('setNameAsync', 'nameAsync')
+      const res = this.$store.dispatch('updateNameFromServer')
+      res.then(() => {
+        console.log('action end', this.$store.state.name)
+      })
     }
   }
 }
@@ -55,9 +67,10 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
   background-color: white;
-  padding: 20px;
+  padding: 15px;
 }
 </style>

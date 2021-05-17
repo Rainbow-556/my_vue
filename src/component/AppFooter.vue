@@ -10,6 +10,7 @@ export default {}
 
 <style lang="scss" scoped>
 .app-footer {
+  box-sizing: border-box;
   min-height: 80px;
   background-color: purple;
   flex-shrink: 0;

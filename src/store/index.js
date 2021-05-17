@@ -25,7 +25,7 @@ const store = new Vuex.Store({
     },
     // 通过方法访问
     getTodoByName(state) {
-      return function (name) {
+      return function(name) {
         if (!name) {
           return state.todos
         }
@@ -42,6 +42,25 @@ const store = new Vuex.Store({
     },
     addTodo(state, todo) {
       state.todos.push(todo)
+    }
+  },
+  actions: {
+    // context是和store具有相同属性和方法的一个对象，为什么不是同一个对象？module？
+    setNameAsync(context, name) {
+      const { commit } = context
+      setTimeout(() => {
+        commit('setName', name)
+      }, 1000)
+    },
+    async updateNameFromServer(context) {
+      const { commit } = context
+      const promise = new Promise(resolve => {
+        setTimeout(() => {
+          resolve('Rainbow556-fromServer')
+        }, 1000)
+      })
+      const name = await promise
+      commit('setName', name)
     }
   }
 })

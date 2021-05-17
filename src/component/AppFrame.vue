@@ -22,6 +22,7 @@ export default {}
     footer，固定在底部
 */
 .app-frame {
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
