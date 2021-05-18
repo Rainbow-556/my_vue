@@ -60,7 +60,7 @@ store.getters.getterA
 store.commit('mutationType')
 ```
 
-- 是同步事务，按照 vuex 的规定，只能是个同步函数，不能包含异步的操作。因为 mutation 认为是改变状态的最终地方，像 VueDevTool 要记录状态改变前后的值，保存快照信息，如果是用异步的方式去改变状态，VueDevTool 并不知道异步回调何时执行，导致无法记录
+- 是同步事务，按照 vuex 的规定，只能是个同步函数，不能包含异步的操作。因为 mutation 认为是改变状态的最终地方，像 VueDevTool 要记录状态改变前后的值，保存快照信息，如果是用异步的方式去改变状态，VueDevTool 并不知道异步回调何时执行，导致无法记录。vuex 的 plugin 就可以监听每次 mutation 的调用
 - 如果是大型多人协作的项目，可以把 mutation 的字符串类型抽取到单独的文件中进行统一管理，这样就能清晰的知道项目里有哪些 mutation
 
 ```js
