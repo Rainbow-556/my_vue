@@ -2,11 +2,16 @@ const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+// const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+// css压缩
+const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
+// js压缩
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const MyPlugin = require('./build/plugin/MyPlugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const webpack = require('webpack')
 // 是否为开发模式
-const isDev = process.env.NODE_ENV === 'development'
+const isDevMode = process.env.NODE_ENV === 'development'
 console.log('build mode:', process.env.NODE_ENV)
 
 // webpack config对象的类型，编写时有代码提示
@@ -23,8 +28,11 @@ const config = {
       hash：这次打包所有结果的hash，所有使用[hash]占位符最后生成的值都是相同的
       chunkhash：每个chunk都会单独计算hash
      */
-    filename: isDev ? 'js/[name].[hash:8].js' : 'js/[name].[chunkhash:8].js'
-    // 修改在html中引用的打包后的js、css、图片等引用路径，例子：https://www.aaa.com/assets/images/a.744973e7.jpg
+    filename: isDevMode ? 'js/[name].[hash:8].js' : 'js/[name].[chunkhash:8].js'
+    /*
+     修改在html中引用的打包后的js、css、图片等引用路径，例子：https://www.aaa.com/assets/images/a.744973e7.jpg
+     不填时，在文件中引用的路径是：images/a.744973e7.jpg，浏览器会默认把当前host作为资源请求的host
+    */
     // publicPath: 'https://www.aaa.com/assets/'
   },
   resolve: {
@@ -53,14 +61,16 @@ const config = {
       {
         test: /\.s?css$/,
         use: [
-          // 把css抽取成单独的文件
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              // 指定在css引用的图片等资源的路径
-              // publicPath: 'https://www.aaa.com/assets/'
-            }
-          },
+          isDevMode
+            ? 'vue-style-loader' // 开发模式使用style-loader，更快
+            : {
+                // 生产模式把css抽取成单独的文件
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                  // 指定在css引用的图片等资源的路径
+                  // publicPath: 'https://www.aaa.com/assets/'
+                }
+              },
           // 把css内容用js动态生成style标签插入到head标签里
           // 'style-loader', // or vue-style-loader(使用vue时，就要用该loader)
           // 把css转换成commonjs对象
@@ -75,7 +85,11 @@ const config = {
             }
           },
           'postcss-loader',
-          // 解决scss文件中引用font文件时的路径问题，https://webpack.js.org/loaders/sass-loader/#problems-with-url
+          /*
+            resolves relative paths in url() statements based on the original source file
+            解决scss文件中引用font文件时的路径问题，https://webpack.js.org/loaders/sass-loader/#problems-with-url
+            https://github.com/angular/angular-cli/issues/5213#issuecomment-284783844
+          */
           'resolve-url-loader',
           // 把scss文件转换成css
           'sass-loader'
@@ -92,10 +106,10 @@ const config = {
         }
       },
       {
-        test: /\.(woff2?|ttf|eot)$/i,
+        test: /\.(woff|woff2|ttf|eot)$/i,
         loader: 'file-loader',
         options: {
-          outputPath: 'font',
+          outputPath: 'fonts',
           name: '[name].[contenthash:8].[ext]'
         }
       }
@@ -116,15 +130,34 @@ const config = {
     }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
-      filename: isDev ? '[name].css' : '[name].[contenthash:8].css',
-      chunkFilename: isDev ? '[id].css' : '[id].[contenthash:8].css'
+      filename: isDevMode ? '[name].css' : '[name].[contenthash:8].css',
+      chunkFilename: isDevMode ? '[name].[id].css' : '[name].[id].[contenthash:8].css'
     }),
     new MyPlugin()
   ],
-  devtool: 'cheap-module-eval-source-map'
+  optimization: {
+    minimize: !isDevMode,
+    minimizer: [
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true
+        // uglifyOptions: {
+        //   output: {
+        //     comments: false
+        //   }
+        // }
+      }),
+      new OptimizeCssAssetsWebpackPlugin()
+    ]
+  },
+  /*
+    https://v4.webpack.js.org/configuration/devtool/
+    生产环境下可以使用none或nosources-source-map
+   */
+  devtool: isDevMode ? 'cheap-module-eval-source-map' : 'none'
 }
 
-if (isDev) {
+if (isDevMode) {
   config.plugins.push(new webpack.HotModuleReplacementPlugin())
   config.devServer = {
     host: 'localhost',

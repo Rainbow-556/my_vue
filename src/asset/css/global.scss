@@ -1,5 +1,8 @@
 @import './normalize.scss';
 @font-face {
   font-family: 'DINPro-Medium';
-  src: url('../font/DINPro-Medium.woff') format('woff');
+  // 引用字体文件使用绝对路径，避免resolve-url-loader在处理相对路径引用时，并且没有开devtool的sourcemap时，打包报错
+  // src: url('../font/DINPro-Medium.woff') format('woff');
+  // https://github.com/angular/angular-cli/issues/5213#issuecomment-284783844
+  src: url('/src/asset/font/DINPro-Medium.woff') format('woff');
 }
