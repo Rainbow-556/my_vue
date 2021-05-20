@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cross-env NODE_ENV=production webpack",
     "watch": "cross-env NODE_ENV=development webpack --watch",
-    "serve": "cross-env NODE_ENV=development webpack-dev-server --progress"
+    "serve": "cross-env NODE_ENV=development webpack-dev-server"
   },
   "author": "",
   "license": "ISC",
@@ -48,6 +48,7 @@
   "dependencies": {
     "@babel/runtime": "^7.14.0",
     "core-js": "^3.12.1",
+    "lottie-web": "^5.7.8",
     "vue": "^2.6.12",
     "vuex": "^3.6.2"
   }

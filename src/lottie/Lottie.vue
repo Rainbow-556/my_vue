@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import lottie from 'lottie-web'
 import vectorAnim from './vectorAnim.json'
 
 export default {

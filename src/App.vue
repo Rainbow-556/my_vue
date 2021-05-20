@@ -5,7 +5,8 @@
       <p class="number">1000</p>
       <p>1000</p>
       <img class="img" :src="img" alt="" />
-      <Lottie />
+      <button @click="showLottie = !showLottie">showLottie</button>
+      <Lottie v-if="showLottie" />
       <VuexTest />
     </AppBody>
     <AppFooter />
@@ -13,19 +14,18 @@
 </template>
 
 <script>
-import Lottie from './lottie/Lottie.vue'
 import AppFrame from './component/AppFrame'
 import AppHeader from './component/AppHeader'
 import AppBody from './component/AppBody'
 import AppFooter from './component/AppFooter'
 import VuexTest from './pages/vuex-test'
-import img from './asset/images/a.jpg'
+import img from './asset/image/a.jpg'
 console.log('App.vue', img)
 
 export default {
   name: 'MyVue',
   components: {
-    Lottie,
+    Lottie: () => import(/* webpackChunkName: "lottie-chunk" */ './lottie/Lottie.vue'),
     AppFrame,
     AppHeader,
     AppBody,
@@ -34,7 +34,8 @@ export default {
   },
   data() {
     return {
-      img
+      img,
+      showLottie: false
     }
   },
   computed: {},

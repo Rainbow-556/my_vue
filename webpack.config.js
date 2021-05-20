@@ -61,16 +61,24 @@ const config = {
       {
         test: /\.s?css$/,
         use: [
-          isDevMode
-            ? 'vue-style-loader' // 开发模式使用style-loader，更快
-            : {
-                // 生产模式把css抽取成单独的文件
-                loader: MiniCssExtractPlugin.loader,
-                options: {
-                  // 指定在css引用的图片等资源的路径
-                  // publicPath: 'https://www.aaa.com/assets/'
-                }
-              },
+          // isDevMode
+          //   ? 'vue-style-loader' // 开发模式使用style-loader，更快
+          //   : {
+          //       // 生产模式把css抽取成单独的文件
+          //       loader: MiniCssExtractPlugin.loader,
+          //       options: {
+          //         // 指定在css引用的图片等资源的路径
+          //         // publicPath: 'https://www.aaa.com/assets/'
+          //       }
+          //     },
+          {
+            // 把css抽取成单独的文件
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // 指定在css引用的图片等资源的路径
+              // publicPath: 'https://www.aaa.com/assets/'
+            }
+          },
           // 把css内容用js动态生成style标签插入到head标签里
           // 'style-loader', // or vue-style-loader(使用vue时，就要用该loader)
           // 把css转换成commonjs对象
@@ -101,7 +109,7 @@ const config = {
         options: {
           limit: 50 * 1024,
           // 输出到images目录下
-          outputPath: 'images',
+          outputPath: 'image',
           name: '[name].[contenthash:8].[ext]'
         }
       },
@@ -109,8 +117,17 @@ const config = {
         test: /\.(woff|woff2|ttf|eot)$/i,
         loader: 'file-loader',
         options: {
-          outputPath: 'fonts',
-          name: '[name].[contenthash:8].[ext]'
+          /*
+            https://github.com/webpack-contrib/file-loader/issues/32#issuecomment-250622904
+            当配置字体文件输出到fonts文件夹，css输出到css文件夹时，css里如果引用了font，经过编译并在浏览器里运行时，
+            css里发起的font文件网络请求地址为：host/css/fonts/xxx.woff，从而导致找不到font文件报404。
+            所以配置publicPath: '../'（回退一级目录）
+            host/css/fonts/xxx.woff -> host/fonts/xxx.woff
+          */
+          // publicPath: '../fonts',
+          publicPath: '../',
+          // outputPath: 'fonts',
+          name: 'font/[name].[contenthash:8].[ext]'
         }
       }
     ]
@@ -130,8 +147,8 @@ const config = {
     }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
-      filename: isDevMode ? '[name].css' : '[name].[contenthash:8].css',
-      chunkFilename: isDevMode ? '[name].[id].css' : '[name].[id].[contenthash:8].css'
+      filename: isDevMode ? 'css/[name].css' : 'css/[name].[contenthash:8].css',
+      chunkFilename: isDevMode ? 'css/[name].[id].css' : 'css/[name].[id].[contenthash:8].css'
     }),
     new MyPlugin()
   ],
@@ -153,6 +170,7 @@ const config = {
   /*
     https://v4.webpack.js.org/configuration/devtool/
     生产环境下可以使用none或nosources-source-map
+    当使用none时，css里引用font文件的路径必须是绝对路径，否则会打包失败
    */
   devtool: isDevMode ? 'cheap-module-eval-source-map' : 'none'
 }
@@ -160,7 +178,8 @@ const config = {
 if (isDevMode) {
   config.plugins.push(new webpack.HotModuleReplacementPlugin())
   config.devServer = {
-    host: 'localhost',
+    // 0.0.0.0表示设置host为本机局域网ip，在本机访问时可通过localhost:8080访问。局域网内的设备可以通过本机ip:8080访问
+    host: '0.0.0.0', // localhost
     port: 8080,
     // 非webpack打包输出的静态文件提供目录，项目根目录里的public下的文件可以直接通过localhost:8080/b.txt访问到
     contentBase: 'public',

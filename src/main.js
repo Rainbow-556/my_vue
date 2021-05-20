@@ -1,9 +1,10 @@
-// babel的useBuiltIns: 'usage'，需手动引入polyfill
+// babel的useBuiltIns: 'entry'，需手动引入polyfill
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
+
 // 打印通过DefinePlugin设置的全局属性
 console.log('DefinePlugin', aNumber, aVersion, process.env.NODE_ENV)
 
