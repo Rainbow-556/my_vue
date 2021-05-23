@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 // css压缩
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
 // js压缩
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const MyPlugin = require('./build/plugin/MyPlugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const webpack = require('webpack')
@@ -43,8 +43,8 @@ const config = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        options: {}
+        // webpack v4 使用cache-loader为babel-loader在编译过程中增加缓存，提升编译速度
+        use: ['cache-loader', 'babel-loader']
       },
       {
         test: /\.vue$/,
@@ -154,18 +154,7 @@ const config = {
   ],
   optimization: {
     minimize: !isDevMode,
-    minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true
-        // uglifyOptions: {
-        //   output: {
-        //     comments: false
-        //   }
-        // }
-      }),
-      new OptimizeCssAssetsWebpackPlugin()
-    ]
+    minimizer: [new TerserPlugin(), new OptimizeCssAssetsWebpackPlugin()]
   },
   /*
     https://v4.webpack.js.org/configuration/devtool/
