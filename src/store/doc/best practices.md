@@ -100,7 +100,7 @@ export default store
 
 - 把复杂的 store 分离成各个小 module，每个 module 拥有自己的 state、mutation、action、getter、甚至是嵌套子模块
 
-### 常见场景下如何正确使用
+### 如何正确使用
 
 1. state 里的数据初始化
 
@@ -253,9 +253,63 @@ export default {
 
 - store 的比较简单时，state、getter、mutation、action 可以放在一起。后续代码量逐渐变多时，可以考虑把它们分离到单独的文件中
 - 当应用变得特别复杂时，store 对象就有可能变得相当臃肿。此时可以按照指定的维度把 store 拆分成一个个小的 module，利于维护
+- 如无特殊要求，应该把 module 的 namespace 设置为 true，避免响应与全局同名的 mutation 和 action，达到更好的封装独立性
 
-### state、getter、action 文件分离，避免文件过大变得复杂
+```js
+const moduleA = {
+  namespace: true,
+  // state是一个函数，让moduleA在模块重用的场景下也能正常工作（与Vue组件的data处理方式一致）
+  state: () => { ... },
+  mutations: { ... },
+  actions: { ... },
+  getters: { ... }
+}
 
-### module 分离
+const moduleB = {
+  namespace: true,
+  state: () => { ... },
+  mutations: { ... },
+  actions: { ... }
+}
 
-### 使用 webpack 的 require.context()方法实现自动注册 vuex 的所有 module、module 里的 mutation、action、getters
+const store = new Vuex.Store({
+  modules: {
+    a: moduleA,
+    b: moduleB
+  }
+})
+
+store.state.a // -> moduleA 的状态
+store.state.b // -> moduleB 的状态
+```
+
+- 使用 createNamespacedHelpers 辅助函数
+
+```js
+import { createNamespacedHelpers } from 'vuex'
+// 解构时重命名，带上module对应的后缀
+const { mapState: mapStateModuleA, mapActions: mapActionsModuleA } = createNamespacedHelpers('some/nested/moduleA')
+
+export default {
+  computed: {
+    // 在 `some/nested/module` 中查找
+    ...mapStateModuleA({
+      a: state => state.a,
+      b: state => state.b
+    })
+  },
+  methods: {
+    // 在 `some/nested/module` 中查找
+    ...mapActionsModuleA(['foo', 'bar'])
+  }
+}
+```
+
+7. 不要在生产环境下使用 vuex 的 strict 严格模式（严格模式会深度监测状态树来检测不合规的状态变更），会影响性能
+
+```js
+const store = new Vuex.Store({
+  // ...
+  strict: process.env.NODE_ENV !== 'production'
+})
+```
