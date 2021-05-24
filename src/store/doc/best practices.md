@@ -19,14 +19,15 @@ Vuex 就是为了解决组件共享状态的问题，一个状态管理工具。
 
 ### Vuex 设计理念
 
-设计思想借鉴于**Flux 架构**  
+设计思想借鉴于**Flux 模式**  
 [Flux 介绍](https://facebook.github.io/flux/docs/in-depth-overview)  
 [Flux 核心概念](https://github.com/facebook/flux/tree/master/examples/flux-concepts)  
-// todo 附加 flux 架构图？
+单向数据流（Data in a Flux application flows in a single direction）
+![alt vuex](./flux.png)
 
 ### 核心概念
 
-![alt 属性文本](./vuex.png)
+![alt vuex](./vuex.png)
 
 ```js
 import Vue from 'vue'
@@ -76,17 +77,32 @@ export default store
 ```
 
 1. store
-   - 就是一个容器，它包含着你的应用中全局共享的状态 state
+
+- 就是一个容器，它包含着你的应用中全局共享的状态 state
+
 2. state
-   - 全局共享的状态具体存放的地方。通过 store.state.todos 访问 todos
-3. getters
-   - 可以认为是 store 的 computed 计算属性。getter 的返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生了改变才会被重新计算。通过 store.getters.doneTodosCount 访问
+
+- 全局共享的状态具体存放的地方。通过 store.state.todos 访问 todos
+
+3. getter
+
+- 可以认为是 store 的 computed 计算属性。getter 的返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生了改变才会被重新计算。通过 store.getters.doneTodosCount 访问
+
 4. mutation
-   - 唯一能改变 state 的方式（不能直接使用~~store.state.todos.push(todo)~~）。只能通过 store.commit('addTodo', todo) 更新数据
+
+- 唯一能改变 state 的方式（不能直接使用~~store.state.todos.push(todo)~~）。只能通过 store.commit('addTodo', todo) 更新数据
+
+5. action
+
+- 类似于 mutation，内部支持异步操作。最终要改变 state 时，也是通过提交 mutation。通过 store.dispatch(actionType, payload) 调用
+
+6. module
+
+- 把复杂的 store 分离成各个小 module，每个 module 拥有自己的 state、mutation、action、getter、甚至是嵌套子模块
 
 ### 常见场景下如何正确使用
 
-1. state 里的数据字段初始化
+1. state 里的数据初始化
 
 ```js
 // store.js
@@ -102,18 +118,141 @@ state: {
 - 如果属性为对象类型，尽可能把对象里的子属性也同时声明，方便知道该属性具体包含哪些子属性
 - 在后续新增属性时，推荐使用 Vue.set(obj, key, value)方式添加新属性，不建议用 spread 运算符重新赋值的形式（每次都会导致该 obj 涉及的所有 getter 都会计算）。使用以上的方式可以使新增的属性是响应式的
 - 建议只把需要用到的属性放到 state 里，不要弄大对象
-
-2. getters
-
-### mapState、mapActions 等辅助函数的使用
-
-当要使用超过 2 个及以上的 state、action、getter，推荐使用辅助函数，代码会变得比较简洁。
+- 使用 mapState 辅助函数导入 state
 
 ```js
-// 直接map
-// 使用别名，如有命名冲突
-// 二次操作，使用函数的方式
+// 在单独构建的版本中辅助函数为 Vuex.mapState
+import { mapState } from 'vuex'
+
+export default {
+  // ...
+  computed: {
+    ...mapState({
+      // 将 this.count 映射为 store.state.count
+      count: state => state.count,
+      // 传字符串参数 'count' 等同于 `state => state.count`
+      countAlias: 'count',
+      // 为了能够使用 `this` 获取局部状态，必须使用常规函数
+      countPlusLocalState(state) {
+        return state.count + this.localCount
+      }
+    })
+  }
+}
 ```
+
+2. getter 相关
+
+- 通常 getter 返回的都是普通值。必要情况下，getter 返回一个函数会特别有用
+
+```js
+export default {
+  // ...
+  getters: {
+    doneTodos(state) {
+      return state.todos.filter(item => item.state === 'done')
+    },
+    // 通过方法访问。外部可通过 store.getters.getTodoByName('vuex') 调用
+    getTodoByName(state) {
+      return function(name) {
+        return state.todos.find(item => item.name === name)
+      }
+    }
+  }
+}
+```
+
+- 使用 mapGetters 辅助函数
+
+```js
+import { mapGetters } from 'vuex'
+
+export default {
+  // ...
+  computed: {
+    // 使用对象展开运算符将 getter 混入 computed 对象中
+    // 把 `this.doneTodosCount` 映射为 `this.$store.getters.doneTodosCount`
+    ...mapGetters(['doneTodosCount', 'anotherGetter']),
+    ...mapGetters({
+      // 设置别名，要使用对象形式
+      // 把 `this.doneCount` 映射为 `this.$store.getters.doneTodosCount`
+      doneCount: 'doneTodosCount'
+    })
+  }
+}
+```
+
+3. mutation 相关
+
+- 统一使用 store.commit(mutationType, payload) 方式提交 mutation，payload 使用对象类型，降低该 mutation 后续新增入参时改动的成本
+- 如果需要动态在 state 里新增属性时，使用 Vue.set(obj, key, value)
+- 使用 mapMutations 辅助函数
+
+```js
+import { mapMutations } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    ...mapMutations([
+      // 将 `this.increment()` 映射为 `this.$store.commit('increment')`
+      'increment',
+      // 将 `this.incrementBy(amount)` 映射为 `this.$store.commit('incrementBy', amount)`
+      'incrementBy'
+    ]),
+    ...mapMutations({
+      // 将 `this.add()` 映射为 `this.$store.commit('increment')`
+      add: 'increment'
+    })
+  }
+}
+```
+
+4. action 相关
+
+- 定义在 store 中的每个 action 的返回值 res 都会被 Vuex 封装成 Promise 的 resolve(res)
+- 使用 async/await 处理 action 里的异步操作，让外部调用方能够监听 action 完成事件
+
+```js
+export default {
+  // ...
+  actions: {
+    // 外部通过store.dispatch('actionA', { a: 1 }).then(res => { // action结束了 })
+    async actionA(context, payload) {
+      const { commit } = context
+      const res = await getDataFromNet(...payload)
+      commit('mutationA', res)
+    }
+  }
+}
+```
+
+- 使用 mapActions 辅助函数
+
+```js
+import { mapActions } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    ...mapActions([
+      // 将 `this.increment()` 映射为 `this.$store.dispatch('increment')`
+      'increment',
+      // 将 `this.incrementBy(amount)` 映射为 `this.$store.dispatch('incrementBy', amount)`
+      'incrementBy'
+    ]),
+    ...mapActions({
+      // 将 `this.add()` 映射为 `this.$store.dispatch('increment')`
+      add: 'increment'
+    })
+  }
+}
+```
+
+6. module 模块分离
+
+- store 的比较简单时，state、getter、mutation、action 可以放在一起。后续代码量逐渐变多时，可以考虑把它们分离到单独的文件中
+- 当应用变得特别复杂时，store 对象就有可能变得相当臃肿。此时可以按照指定的维度把 store 拆分成一个个小的 module，利于维护
 
 ### state、getter、action 文件分离，避免文件过大变得复杂
 
