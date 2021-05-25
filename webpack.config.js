@@ -23,10 +23,14 @@ const config = {
     // webpack打包后的文件输出根目录
     path: path.join(__dirname, 'dist'),
     /*
+      module：所有文件都是module，如js、css、图片、字体等
+      chunk：以entry为起点，entry本身及其所有依赖的module统称为一个chunk
+    */
+    /*
      开启dev-server时，只能使用[hash]，否则会dev-server会报错
      hash和chunkhash的区别：
       hash：这次打包所有结果的hash，所有使用[hash]占位符最后生成的值都是相同的
-      chunkhash：每个chunk都会单独计算hash
+      chunkhash：根据每个chunk里所有的模块内容生成hash
      */
     filename: isDevMode ? 'js/[name].[hash:8].js' : 'js/[name].[chunkhash:8].js'
     /*
