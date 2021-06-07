@@ -22,6 +22,7 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'VuexTest',
+  components: {},
   data() {
     return {
       value: 1,

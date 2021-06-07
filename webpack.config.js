@@ -149,6 +149,8 @@ const config = {
       // Options similar to the same options in webpackOptions.output
       filename: isDevMode ? 'css/[name].css' : 'css/[name].[contenthash:8].css',
       chunkFilename: isDevMode ? 'css/[name].[id].css' : 'css/[name].[id].[contenthash:8].css'
+      // 设置css文件单独的publicPath
+      // publicPath: ''
     }),
     new MyPlugin()
   ],
