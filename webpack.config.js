@@ -178,6 +178,8 @@ if (isDevMode) {
     port: 8080,
     // 非webpack打包输出的静态文件提供目录，项目根目录里的public下的文件可以直接通过localhost:8080/b.txt访问到
     contentBase: 'public',
+    // 默认是 /，用于设置打包输出的文件在dev server上的访问地址。webpack建议该值与output.publicPath保持一致
+    publicPath: '/',
     hot: true,
     open: false
   }
